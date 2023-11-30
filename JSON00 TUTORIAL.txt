@@ -1,0 +1,98 @@
+JSON (JavaScript Object Notation) es un formato de intercambio de datos y se utiliza comúnmente para la comunicación cliente-servidor.
+
+1) Los métodos json.dump() y json.dumps() para convertir Python Types (diccionarios, listas, cadenas, números, etc.) en objetos JSON:
+	a) El método json.dump() (sin "s" en "dump") se utiliza para escribir objetos serializados de Python como datos con formato JSON en un archivo.
+	b) El método json.dumps() codifica cualquier objeto Python en una cadena con formato JSON.
+Ejemplo json.dump(), convertir Diccionario de Python en objeto JSON:
+json_data = json.dumps(DiccionarioDePython)
+Ejemplo json.dumps(), guardar Diccionario de Python como un archivo JSON:
+with open("archivojson.json", "w") as write_file:	#El archivo "archivojson.json" se crea en esta línea, si existiera se sobrescribirá.
+    json.dump(DiccionarioDePython, write_file, indent=4, sort_keys=True)
+
+2) Los métodos json.load() y json.loads() para convertir objetos JSON en Python Types (diccionarios, listas, cadenas, números, etc.):
+	a) El método json.load() (sin "s" en "load") se utiliza para parsear o analizar (leer datos JSON y convertir datos codificados/formateados como JSON en tipos Python) desde una URL o un archivo.
+	b) El método json.loads() parsea o analiza cadenas codificadas/formateadas como JSON.
+Ejemplo json.load(), convertir un objeto JSON en Diccionario de Python:
+dic_python = json.loads(VariableDelJSON)
+Ejemplo json.loads(), cargar un Diccionario de Python desde un archivo JSON:
+with open("archivojson.json", "r") as read_file:	#El archivo "archivojson.json" ya debe existir y contener un diccionario de Python.
+    DiccionarioDePython = json.load(read_file)
+
+3) Imprimir (o acceder a) un valor de un objeto JSON:
+dic_python = json.loads(VariableDelJSON) #Primero hay que convertirlo a Diccionario
+print(dic_python['key2']) #Como cualquier diccionario de Python
+
+4) PrettyPrint en Python es una función proporcionada por el módulo json que se utiliza para formatear de manera legible la representación en cadena de un objeto JSON.
+json_pretty = json.dumps(json_data, indent=4, sort_keys=True)
+	#indent: Especifica el número de espacios para sangrar en cada nivel (el valor predeterminado es None).
+	#sort_keys: Si se establece en True, las claves del objeto JSON se ordenarán alfabéticamente (útil para mantener consistencia en la salida).
+	#separators: Permite personalizar los separadores utilizados en la cadena JSON generada, Ej: separators=(",", " = ") #La , separará los elementos y el = seprará las claves de los valores.
+
+5) Convertir objetos de clases de Python definidas por el usuario en objetos JSON, usando la clase JSONEncoder del módulo json de Python:
+El módulo json integrado de Python solo puede manejar tipos primitivos de Python (el codificador JSON json.dump() y json.dumps() solo sabe cómo serializar el conjunto básico de tipos de objetos de forma predeterminada como diccionario, listas, cadenas, números, etc.).
+Para serializar una clase definida por nosotros, tenemos que usar la clase JSONEncoder del módulo json de Python.
+La clase llamada JSONEncoder se utiliza para personalizar la serialización de objetos a formato JSON. La clase JSONEncoder está diseñada para ser subclasificada, permitiéndote definir tu propia lógica de codificación para tipos de datos personalizados.
+Aquí hay una breve explicación de la clase JSONEncoder y cómo puedes usarla:
+Clase JSONEncoder:
+La clase JSONEncoder está definida en el módulo json y es responsable de codificar objetos Python en formato JSON. Puedes subclasificar esta clase y sobrescribir sus métodos para personalizar el proceso de codificación.
+Métodos importantes:
+default(self, o): Este método es llamado por json.dumps() cuando encuentra un objeto que no puede ser serializado por defecto. Puedes sobrescribir este método en tu subclase para manejar tipos de datos personalizados y devolver una representación serializable.
+encode(self, o): Este método es llamado por json.dumps() para codificar un objeto en una cadena JSON. Este método llama a default() para manejar objetos no serializables.
+Ejemplo:
+import json
+class MiEncoder(json.JSONEncoder):
+    def default(self, obj):
+        # Personaliza la codificación para tipos de datos específicos
+        if isinstance(obj, MiTipoPersonalizado):
+            return obj.to_json()  # Supongamos que MiTipoPersonalizado tiene un método to_json()
+        # Si el objeto no es serializable por defecto, levanta un error
+        return super().default(obj)
+
+# Ejemplo de uso
+mi_objeto = MiTipoPersonalizado()
+json_string = json.dumps(mi_objeto, cls=MiEncoder)
+
+En este ejemplo, hemos creado una subclase MiEncoder que hereda de JSONEncoder y hemos sobrescrito el método default() para manejar la codificación personalizada de un tipo de datos llamado MiTipoPersonalizado. Luego, al usar json.dumps(), especificamos la clase de codificador personalizada con el argumento cls.
+Esto te permite tener un mayor control sobre cómo se serializan objetos específicos al formato JSON. Es especialmente útil cuando trabajas con tipos de datos personalizados que no son serializables de manera predeterminada.
+
+6) Convertir objetos JSON en instancias (objetos) de clases de Python definidas por el usuario, usando el parámetro object_hook en el método json.loads():
+El object_hook es una función que se llama con cada diccionario JSON que se está analizando y permite personalizar la creación de objetos Python.
+Aquí hay un ejemplo de cómo puedes convertir un diccionario JSON en un objeto de la clase Vehicle utilizando el parámetro object_hook:
+import json
+class Vehicle:
+    def __init__(self, name, engine, price):
+        self.name = name
+        self.engine = engine
+        self.price = price
+
+def dict_to_vehicle(d):
+    if 'name' in d and 'engine' in d and 'price' in d:
+        return Vehicle(d['name'], d['engine'], d['price'])
+    return d
+
+# JSON de ejemplo
+json_data = '{ "name": "Toyota Rav4", "engine": "2.5L", "price": 32000 }'
+
+# Carga del JSON utilizando el object_hook
+vehicle_instance = json.loads(json_data, object_hook=dict_to_vehicle)
+
+# Verificación del resultado
+print(vehicle_instance)
+
+En este ejemplo:
+Vehicle es una clase simple con un constructor que toma los atributos name, engine, y price.
+dict_to_vehicle es una función que verifica si el diccionario tiene las claves necesarias y, en ese caso, crea una instancia de la clase Vehicle con esos valores.
+Cuando llamamos a json.loads() con el parámetro object_hook=dict_to_vehicle, la función dict_to_vehicle se llamará para cada diccionario en el JSON analizado.
+Esto permite que el diccionario JSON se convierta en un objeto de la clase Vehicle. Ten en cuenta que esta es solo una implementación básica, y puedes adaptar la función dict_to_vehicle según tus necesidades y la estructura específica de tu JSON y clase personalizada.
+
+7)Comprobar si una cadena es JSON válida en Python: hay 2 formas de hacerlo, en Python y en la línea de comandos DOS.
+En Python: json.loads() and json.load() arrojarán un ValueError si la cadena o los datos que pasa no se pueden decodificar como JSON y nos dirá donde está el error.
+Ejemplo:
+import json
+InvalidJsonData = """{ "company":{ "employee":{ "name":"emma", "payble":{ "salary":7000 "bonus":800} } } }"""
+json.loads(InvalidJsonData)
+#json.decoder.JSONDecodeError: Expecting ',' delimiter: line 1 column 68 (char 67)
+En la línea de comandos DOS: echo "CADENA_JSON" | python -m json.tool (si pasa la prueba imprimirá el JSON, si no la pasa nos dirá donde está el error)
+Ejemplo:
+echo {"company":{"employee":{"name":"emma","payble":{"salary":7000"bonus":800}}}} | python -m json.tool
+#Expecting ',' delimiter: line 1 column 62 (char 61)
