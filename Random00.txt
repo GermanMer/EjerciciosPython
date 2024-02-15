@@ -1,0 +1,86 @@
+Python Random Module, Secrets Module and String Module.
+
+1) Python Random Module is a pseudo-random number (integer and float) generator.
+
+import random
+
+# random number from 0 to 1
+print(random.random())
+# Output 0.16123124494385477
+
+# random number from 10 to 20
+print(random.randint(10, 20))
+# Output 18
+
+# random number from 10 to 20 with step 2
+print(random.randrange(10, 20, 2))
+# Output 14
+
+# random float number within a range
+print(random.uniform(5.5, 25.5))
+# Output 5.86390810771935
+
+# random choice from sequence
+print(random.choice([10, 20, 30, 40, 50]))
+# Output 30
+
+# random sample from sequence (elementos únicos)
+print(random.sample([10, 20, 30, 40, 50], k=3)) #k is the quantity to sample
+# Output [50, 10, 20]
+
+# random choices from sequence (los elementos seleccionados pueden repetirse)
+print(random.choices([10, 20, 30, 40, 50], k=3))
+# Output [30, 10, 40]
+
+# random shuffle
+x = [10, 20, 30, 40, 50, 60]
+random.shuffle(x)
+print(x)
+# [60, 10, 30, 20, 50, 40]
+
+# random seed (permite establecer el estado interno del generador de números aleatorios, lo que significa que si se inicializa con la misma semilla, el generador producirá la misma secuencia de números aleatorios en ejecuciones diferentes del programa).
+random.seed(2)
+print(random.randint(10, 20))
+
+2) Python Secrets Module to Generate secure random numbers for managing secrets.
+Python 3.6 introduced a secrets module for generating robust and secure random numbers. The cryptographically secure random generator generates random data using synchronization methods to ensure that no two processes can obtain the same data simultaneously.
+The random generator provided by the Python random module is a pseudo-random number generator that is not cryptographically secure. As a result secrets module is added in Python 3.6 and onwards to secure the random number generator.
+The secrets module is CSPRNG (Cryptographically Strong Pseudo-Random Number Generator). It is used to produce random numbers that are secure and useful in security-sensitive applications. The PEP – 0506 is designed to add the secrets module to the Python standard library.
+Use the secrets module for following standard security-related functions:
+	Generating random numbers,
+	Creating passwords and OTP.
+	Random token.
+	Password recovery safe URLs and session keys.
+
+3) Python random.choice() function to select a random item from a String, List, Set, etc.
+random.choice(list)		Choose a random item from a sequence. Here seq can be a list, tuple, string, or any iterable like range.
+random.choices(list, k=3)	Choose multiple random items from a list, set, or any data structure.
+random.choice(range(10, 101))	Pick a single random number from range 1 to 100
+random.getrandbits(1)		Returns a random boolean
+random.choice(list(dict1))	Choose a random key from a dictionary
+np.random.choice()		Return random choice from a multidimensional array
+secrets.choice(list1)		Choose a random item from the list securely
+
+4) Generate Random Strings
+We can generate the random string using the random module and string module. Use the below steps to create a random string of any length in Python.
+String Constants:
+ascii_lowercase	Contain all lowercase letters
+ascii_uppercase	Contain all uppercase letters
+ascii_letters	Contain both lowercase and uppercase letters
+digits		Contain digits ‘0123456789’.
+punctuation	All special symbols !”#$%&'()*+,-./:;<=>?@[\]^_`{|}~.
+whitespace	Includes the characters space, tab, linefeed, return, formfeed, and vertical tab [^ \t\n\x0b\r\f]
+printable	characters that are considered printable. This is a combination of constants digits, letters, punctuation, and whitespace.
+
+import random
+import string
+
+def get_random_string(length):
+    # choose from all lowercase letter
+    letters = string.ascii_lowercase
+    result_str = ''.join(random.choice(letters) for i in range(length))
+    print("Random string of length", length, "is:", result_str)
+
+get_random_string(8)
+get_random_string(6)
+get_random_string(4)
